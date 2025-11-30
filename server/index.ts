@@ -1,5 +1,4 @@
 import express, { type Request, Response, NextFunction } from "express";
-import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -12,8 +11,6 @@ declare module "http" {
     rawBody: unknown;
   }
 }
-
-app.use(compression({ level: 6, threshold: 100 }));
 
 app.use(
   express.json({
