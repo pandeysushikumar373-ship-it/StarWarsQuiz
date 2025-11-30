@@ -1,25 +1,14 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Fuse from "fuse.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "@/components/theme-provider";
+import { useQuery } from "@tanstack/react-query";
 import { Search, Sun, Moon } from "lucide-react";
-
-const SAMPLE_DATA = [
-  { id: 1, title: "Coffee Culture: A Short History", description: "Explore coffee shops, origins and rituals across the world.", tags: ["coffee", "culture", "history"], date: "2024-12-02" },
-  { id: 2, title: "Metaverse UX Patterns", description: "Design principles for immersive experiences and social spaces.", tags: ["ux", "metaverse", "design"], date: "2025-03-10" },
-  { id: 3, title: "AI for Creators", description: "How small creators leverage AI to scale content workflow.", tags: ["ai", "creators", "productivity"], date: "2024-09-30" },
-  { id: 4, title: "Street Food Guide", description: "A lovingly curated guide to the best street food in your city.", tags: ["food", "guide", "local"], date: "2023-05-20" },
-  { id: 5, title: "Photography: Light & Mood", description: "Techniques to capture mood using natural and artificial light.", tags: ["photography", "camera", "light"], date: "2025-01-15" },
-  { id: 6, title: "Cryptic Puzzles", description: "A book of puzzles to stretch your mind and patience.", tags: ["puzzles", "games", "brain"], date: "2022-11-01" },
-  { id: 7, title: "Sustainable Architecture", description: "Design strategies that prioritize ecology and people.", tags: ["architecture", "sustainability"], date: "2024-06-14" },
-  { id: 8, title: "Guide to Freelancing", description: "Practical advice for building a freelance career online.", tags: ["freelance", "career", "guide"], date: "2025-02-21" },
-  { id: 9, title: "Gardening in Small Spaces", description: "How to grow a thriving garden on balconies and windowsills.", tags: ["gardening", "home", "plants"], date: "2023-07-09" },
-  { id: 10, title: "Beginner's Guide to JavaScript", description: "Learn modern JavaScript fundamentals with hands-on examples.", tags: ["javascript", "programming", "guide"], date: "2025-04-02" },
-];
+import type { SearchItem } from "@shared/schema";
 
 interface SearchResult {
-  item: typeof SAMPLE_DATA[0];
+  item: SearchItem;
   matches?: Array<{ key: string; indices: [number, number][] }>;
   score?: number;
 }
@@ -61,8 +50,18 @@ export default function SearchPage() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Fetch data from API
+  const { data: items = [] } = useQuery({
+    queryKey: ["/api/items"],
+    queryFn: async () => {
+      const res = await fetch("/api/items");
+      if (!res.ok) throw new Error("Failed to fetch items");
+      return res.json() as Promise<SearchItem[]>;
+    },
+  });
+
   const fuse = useMemo(() => {
-    return new Fuse(SAMPLE_DATA, {
+    return new Fuse(items, {
       includeMatches: true,
       threshold: 0.36,
       keys: [
@@ -72,10 +71,10 @@ export default function SearchPage() {
       ],
       minMatchCharLength: 2,
     });
-  }, []);
+  }, [items]);
 
   const results = useMemo(() => {
-    let filtered = SAMPLE_DATA;
+    let filtered = items;
 
     if (query.trim()) {
       const fuseResults = fuse.search(query);
@@ -85,7 +84,7 @@ export default function SearchPage() {
         score: result.score,
       })) as SearchResult[];
     } else {
-      filtered = SAMPLE_DATA.map((item) => ({ item }));
+      filtered = items.map((item) => ({ item }));
     }
 
     if (activeTag) {
@@ -99,7 +98,7 @@ export default function SearchPage() {
     }
 
     return filtered;
-  }, [query, activeTag, sortBy, fuse]);
+  }, [query, activeTag, sortBy, fuse, items]);
 
   const paginatedResults = useMemo(() => {
     return results.slice(0, perPage);
@@ -107,13 +106,13 @@ export default function SearchPage() {
 
   const allTags = useMemo(() => {
     const tagMap = new Map<string, number>();
-    SAMPLE_DATA.forEach((item) => {
+    items.forEach((item) => {
       item.tags.forEach((tag) => {
         tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
       });
     });
     return Array.from(tagMap.entries());
-  }, []);
+  }, [items]);
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
@@ -125,7 +124,7 @@ export default function SearchPage() {
     }
 
     const tokens = new Set<string>();
-    SAMPLE_DATA.forEach((item) => {
+    items.forEach((item) => {
       item.title.split(/\s+/).forEach((word) => {
         if (word.toLowerCase().includes(value.toLowerCase())) {
           tokens.add(word);
@@ -142,7 +141,7 @@ export default function SearchPage() {
     setShowSuggestions(tokens.size > 0);
   };
 
-  const getMatchIndices = (item: any, key: string, match?: any): [number, number][] => {
+  const getMatchIndices = (item: SearchItem, key: string, match?: any): [number, number][] => {
     if (!match) return [];
     const keyMatch = match.find((m: any) => m.key === key);
     return keyMatch?.indices || [];
