@@ -7,17 +7,19 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Get all search items
-  app.get("/api/items", async (req, res) => {
-    try {
-      const items = await storage.getSearchItems();
+  app.get("/api/items", (req, res) => {
+    res.set({
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
+      "ETag": "items-v1",
+    });
+    
+    storage.getSearchItems().then(items => {
       res.json(items);
-    } catch (error) {
+    }).catch(err => {
       res.status(500).json({ error: "Failed to fetch items" });
-    }
+    });
   });
 
-  // Add new search item
   app.post("/api/items", async (req, res) => {
     try {
       const parsed = insertSearchItemSchema.safeParse(req.body);
@@ -26,6 +28,7 @@ export async function registerRoutes(
         return;
       }
       const item = await storage.addSearchItem(parsed.data);
+      res.set("Cache-Control", "no-cache");
       res.status(201).json(item);
     } catch (error) {
       res.status(500).json({ error: "Failed to create item" });

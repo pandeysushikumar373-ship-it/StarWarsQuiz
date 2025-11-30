@@ -1,10 +1,10 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Fuse from "fuse.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "@/components/theme-provider";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Sun, Moon, Loader2 } from "lucide-react";
+import { Search, Sun, Moon } from "lucide-react";
 import type { SearchItem } from "@shared/schema";
 
 interface SearchResult {
@@ -49,22 +49,18 @@ export default function SearchPage() {
   const [sortBy, setSortBy] = useState<"relevance" | "newest" | "oldest">("relevance");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Fetch data from API with stale-while-revalidate
-  const { data: items = [], isLoading } = useQuery({
+  // Fetch data from API
+  const { data: items = [] } = useQuery({
     queryKey: ["/api/items"],
     queryFn: async () => {
       const res = await fetch("/api/items");
       if (!res.ok) throw new Error("Failed to fetch items");
       return res.json() as Promise<SearchItem[]>;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
   });
 
   const fuse = useMemo(() => {
-    if (items.length === 0) return null;
     return new Fuse(items, {
       includeMatches: true,
       threshold: 0.36,
@@ -78,8 +74,6 @@ export default function SearchPage() {
   }, [items]);
 
   const results = useMemo(() => {
-    if (!fuse) return [];
-    
     let filtered = items;
 
     if (query.trim()) {
@@ -120,13 +114,8 @@ export default function SearchPage() {
     return Array.from(tagMap.entries());
   }, [items]);
 
-  const handleQueryChange = useCallback((value: string) => {
+  const handleQueryChange = (value: string) => {
     setQuery(value);
-
-    // Debounce suggestions
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
 
     if (value.trim().length < 2) {
       setSuggestions([]);
@@ -134,33 +123,23 @@ export default function SearchPage() {
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(() => {
-      const tokens = new Set<string>();
-      items.forEach((item) => {
-        item.title.split(/\s+/).forEach((word) => {
-          if (word.toLowerCase().includes(value.toLowerCase())) {
-            tokens.add(word);
-          }
-        });
-        item.tags.forEach((tag) => {
-          if (tag.toLowerCase().includes(value.toLowerCase())) {
-            tokens.add(tag);
-          }
-        });
+    const tokens = new Set<string>();
+    items.forEach((item) => {
+      item.title.split(/\s+/).forEach((word) => {
+        if (word.toLowerCase().includes(value.toLowerCase())) {
+          tokens.add(word);
+        }
       });
+      item.tags.forEach((tag) => {
+        if (tag.toLowerCase().includes(value.toLowerCase())) {
+          tokens.add(tag);
+        }
+      });
+    });
 
-      setSuggestions(Array.from(tokens).slice(0, 8));
-      setShowSuggestions(tokens.size > 0);
-    }, 100);
-  }, [items]);
-
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
+    setSuggestions(Array.from(tokens).slice(0, 8));
+    setShowSuggestions(tokens.size > 0);
+  };
 
   const getMatchIndices = (item: SearchItem, key: string, match?: any): [number, number][] => {
     if (!match) return [];
@@ -246,12 +225,7 @@ export default function SearchPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Results */}
             <div className="lg:col-span-2 space-y-3">
-              {isLoading ? (
-                <div className="rounded-lg glass-effect dark:bg-card light:bg-white/50 p-8 text-center flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <p className="text-muted-foreground">Loading items...</p>
-                </div>
-              ) : paginatedResults.length > 0 ? (
+              {paginatedResults.length > 0 ? (
                 paginatedResults.map((result) => {
                   const titleMatch = getMatchIndices(result.item, "title", result.matches);
                   const descMatch = getMatchIndices(result.item, "description", result.matches);
