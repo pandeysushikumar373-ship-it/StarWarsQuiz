@@ -1,10 +1,25 @@
+
+Hi pandeysushikuma,
+what do you want to make?
+
+Describe the idea you want to build…
+App theme
+
+Start creating for free
+ to unlock more usage
+
+Attached file
+Pasted--doctype-html-html-lang-en-head-meta-charset-utf-8-meta-name-viewport-content-widt-1764497516137_1764497516148.txt
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Beautiful Search Engine</title>
+
+<!-- Fuse.js CDN for fuzzy search -->
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+
 <style>
   :root{
     --bg: #0f1724;
@@ -76,11 +91,6 @@
     font-size:15px;
     outline:none;
     box-shadow: 0 6px 18px rgba(2,6,23,0.45);
-    transition: all 0.2s ease;
-  }
-  input.search:focus{
-    border-color:rgba(110,231,183,0.2);
-    box-shadow: 0 6px 20px rgba(96,165,250,0.2);
   }
   .input-icon{
     position:absolute;
@@ -94,10 +104,7 @@
   .btn{
     padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#042022;font-weight:600;cursor:pointer;
     box-shadow: 0 6px 18px rgba(96,165,250,0.12);
-    transition: transform 0.15s ease;
   }
-  .btn:hover{transform:translateY(-2px);box-shadow: 0 8px 24px rgba(96,165,250,0.2);}
-  .btn:active{transform:translateY(0);}
 
   .results{
     display:grid;
@@ -127,9 +134,7 @@
   .title{font-weight:700;margin:0 0 6px 0}
   .desc{margin:0;color:var(--muted);font-size:13px}
   .meta{margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-  .tag{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;transition:all 0.15s ease;}
-  .tag:hover{background:rgba(110,231,183,0.1);}
-  .tag.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#042022;}
+  .tag{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-weight:600;font-size:12px}
 
   .highlight{
     background:linear-gradient(90deg,#ffeaa7 10%, #ffd86b 90%);
@@ -144,7 +149,7 @@
     background:var(--card);border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.03);
     max-height:220px;overflow:auto;z-index:40;
   }
-  .suggestion{padding:8px;border-radius:8px;cursor:pointer;transition:all 0.1s ease;}
+  .suggestion{padding:8px;border-radius:8px;cursor:pointer}
   .suggestion:hover, .suggestion.active{background:rgba(255,255,255,0.02)}
 
   .controls{display:flex;gap:10px;align-items:center}
@@ -152,21 +157,12 @@
 
   footer{margin-top:18px;color:var(--muted);font-size:13px}
 
-  select{
-    background:var(--card);
-    color:inherit;
-    border:1px solid rgba(255,255,255,0.03);
-    border-radius:8px;
-    padding:8px;
-    cursor:pointer;
-    transition:all 0.15s ease;
-  }
-  select:hover{border-color:rgba(110,231,183,0.2);}
-
+  /* Responsive */
   @media (max-width:880px){
     .results{grid-template-columns: 1fr; }
     .side{order:2}
   }
+
 </style>
 </head>
 <body>
@@ -176,7 +172,7 @@
     <div class="logo">SI</div>
     <div>
       <h1>SearchInk</h1>
-      <p class="lead">Fast, pretty & fuzzy — search anything. Try "coffee" or "metaverse".</p>
+      <p class="lead">Fast, pretty & fuzzy — search anything. Try “coffee” or “metaverse”.</p>
     </div>
     <div style="margin-left:auto" class="controls">
       <div class="small" id="count">0 results</div>
@@ -190,8 +186,10 @@
       <div class="input-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.9"><path d="M21 21l-4.35-4.35" stroke="white" stroke-width="1.6" stroke-linecap="round"/><circle cx="11" cy="11" r="6" stroke="white" stroke-width="1.6"/></svg>
       </div>
+
       <div id="suggestions" class="suggestions" hidden></div>
     </div>
+
     <button id="searchBtn" class="btn">Search</button>
   </div>
 
@@ -210,14 +208,14 @@
 
       <div style="margin-top:14px">
         <label class="small">Results per page</label>
-        <select id="perPage" style="width:100%;margin-top:8px;">
+        <select id="perPage" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:inherit">
           <option>5</option><option selected>10</option><option>20</option>
         </select>
       </div>
 
       <div style="margin-top:14px">
         <label class="small">Sort</label>
-        <select id="sort" style="width:100%;margin-top:8px;">
+        <select id="sort" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:inherit">
           <option value="relevance" selected>Relevance</option>
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
@@ -227,11 +225,15 @@
   </div>
 
   <footer>
-    Built with ❤️ — demo dataset. Try searching for "coffee" or "metaverse".
+    Built with ❤️ — demo dataset. Replace <code>DATA</code> with your own JSON to adapt.
   </footer>
 </div>
 
 <script>
+/* --------------------
+   Sample dataset (replace with real data or load from API)
+   Each item: id, title, description, tags (array), date (ISO)
+   -------------------- */
 const DATA = [
   { id:1, title:"Coffee Culture: A Short History", description:"Explore coffee shops, origins and rituals across the world.", tags:["coffee","culture","history"], date:"2024-12-02" },
   { id:2, title:"Metaverse UX Patterns", description:"Design principles for immersive experiences and social spaces.", tags:["ux","metaverse","design"], date:"2025-03-10" },
@@ -243,8 +245,13 @@ const DATA = [
   { id:8, title:"Guide to Freelancing", description:"Practical advice for building a freelance career online.", tags:["freelance","career","guide"], date:"2025-02-21" },
   { id:9, title:"Gardening in Small Spaces", description:"How to grow a thriving garden on balconies and windowsills.", tags:["gardening","home","plants"], date:"2023-07-09" },
   { id:10, title:"Beginner's Guide to JavaScript", description:"Learn modern JavaScript fundamentals with hands-on examples.", tags:["javascript","programming","guide"], date:"2025-04-02" },
+  // ... add more items
 ];
 
+/* --------------------
+   Setup Fuse.js with options
+   Weighted keys: title > tags > description
+   -------------------- */
 const fuseOptions = {
   includeMatches: true,
   threshold: 0.36,
@@ -257,6 +264,9 @@ const fuseOptions = {
 };
 const fuse = new Fuse(DATA, fuseOptions);
 
+/* --------------------
+   DOM references
+   -------------------- */
 const qEl = document.getElementById('q');
 const hitsEl = document.getElementById('hits');
 const suggestionsEl = document.getElementById('suggestions');
@@ -267,27 +277,25 @@ const filterTagsEl = document.getElementById('filterTags');
 const searchBtn = document.getElementById('searchBtn');
 const toggleThemeBtn = document.getElementById('toggleTheme');
 
+/* --------------------
+   UI State
+   -------------------- */
 let state = {
   query: '',
   results: [],
+  page: 1,
+  perPage: parseInt(perPageEl.value,10),
   activeTag: null,
-  perPage: 10,
+  suggestionIndex: -1,
 };
 
-function debounce(fn, wait=150){ 
-  let t; 
-  return (...args)=>{ 
-    clearTimeout(t); 
-    t=setTimeout(()=>fn(...args), wait); 
-  }; 
-}
-
-function escapeHtml(s){ 
-  return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); 
-}
-
+/* --------------------
+   Utility helpers
+   -------------------- */
+function debounce(fn, wait=220){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), wait); }; }
 function highlightText(text, matches){
   if(!matches || matches.length===0) return escapeHtml(text);
+  // build map of ranges
   let fragments = [];
   let last = 0;
   matches.forEach(m=>{
@@ -299,13 +307,17 @@ function highlightText(text, matches){
   if(last < text.length) fragments.push(escapeHtml(text.slice(last)));
   return fragments.join('');
 }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
 
+/* --------------------
+   Suggestions: show top 6 unique token suggestions from titles/tags
+   -------------------- */
 function showSuggestions(query){
   if(!query || query.trim().length<2){ suggestionsEl.hidden = true; return; }
   const tokens = new Set();
   for(const item of DATA){
     if(tokens.size>=12) break;
-    const t = item.title.split(/\s+/).filter(Boolean);
+    const t = item.title.split(/\s+/).map(s=>s.replace(/[^\w]/g,'')).filter(Boolean);
     for(const w of t){
       if(w.toLowerCase().includes(query.toLowerCase())) tokens.add(w);
       if(tokens.size>=12) break;
@@ -316,7 +328,7 @@ function showSuggestions(query){
     }
   }
   suggestionsEl.innerHTML = '';
-  Array.from(tokens).slice(0,8).forEach((s)=>{
+  Array.from(tokens).slice(0,8).forEach((s, idx)=>{
     const div = document.createElement('div');
     div.className = 'suggestion';
     div.textContent = s;
@@ -326,6 +338,9 @@ function showSuggestions(query){
   suggestionsEl.hidden = tokens.size===0;
 }
 
+/* --------------------
+   Build tag filter UI
+   -------------------- */
 function buildTagFilters(){
   const allTags = new Map();
   DATA.forEach(it=> it.tags.forEach(t=>{
@@ -336,100 +351,192 @@ function buildTagFilters(){
     const btn = document.createElement('button');
     btn.className = 'tag';
     btn.textContent = `${tag} · ${count}`;
-    if(state.activeTag === tag) btn.classList.add('active');
     btn.addEventListener('click', ()=>{
       state.activeTag = state.activeTag === tag ? null : tag;
       applySearch();
     });
+    if(state.activeTag === tag){
+      btn.style.background = 'linear-gradient(90deg,var(--accent),var(--accent-2))';
+      btn.style.color = '#042022';
+    }
     filterTagsEl.appendChild(btn);
   }
 }
 
+/* --------------------
+   Render results with pagination & highlighting
+   -------------------- */
 function renderResults(){
-  let filtered = state.results;
-  const perPage = parseInt(perPageEl.value, 10);
-  const sort = sortEl.value;
-  
-  if(sort === 'newest'){
-    filtered = filtered.sort((a,b) => new Date(b.item.date).getTime() - new Date(a.item.date).getTime());
-  } else if(sort === 'oldest'){
-    filtered = filtered.sort((a,b) => new Date(a.item.date).getTime() - new Date(b.item.date).getTime());
-  }
-  
+  const start = (state.page - 1) * state.perPage;
+  const end = start + state.perPage;
+  const pageItems = state.results.slice(start, end);
   hitsEl.innerHTML = '';
-  const paginated = filtered.slice(0, perPage);
-  
-  if(paginated.length === 0){
-    hitsEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">No results found</div>';
+
+  if(state.results.length === 0){
+    hitsEl.innerHTML = `<div style="padding:26px;color:var(--muted)">No results — try different words or remove filters.</div>`;
+    countEl.textContent = '0 results';
     return;
   }
-  
-  paginated.forEach(r=>{
-    const item = r.item;
-    const titleMatch = r.matches?.find(m => m.key === 'title')?.indices || [];
-    const descMatch = r.matches?.find(m => m.key === 'description')?.indices || [];
-    
+
+  countEl.textContent = `${state.results.length} result${state.results.length>1?'s':''}`;
+  pageItems.forEach(r=>{
+    const item = r.item || r; // if from fuse: r.item, else raw
+    const matches = r.matches || [];
+    // find match info for title and description
+    let titleMatches = [];
+    let descMatches = [];
+    matches.forEach(m=>{
+      if(m.key === 'title') titleMatches = m.indices;
+      if(m.key === 'description') descMatches = m.indices;
+    });
+
     const div = document.createElement('div');
     div.className = 'hit';
+    div.tabIndex = 0;
     div.innerHTML = `
-      <h3 class="title">${titleMatch.length ? highlightText(item.title, titleMatch) : escapeHtml(item.title)}</h3>
-      <p class="desc">${descMatch.length ? highlightText(item.description, descMatch) : escapeHtml(item.description)}</p>
-      <div class="meta">
-        ${item.tags.map(t => `<span class="tag" style="cursor:default">${escapeHtml(t)}</span>`).join('')}
-        <span>${new Date(item.date).toLocaleDateString()}</span>
-      </div>
+      <div class="title">${ highlightText(item.title, titleMatches) }</div>
+      <div class="desc">${ highlightText(item.description, descMatches) }</div>
+      <div class="meta">${ item.tags.map(t=>' <span class="tag">'+escapeHtml(t)+'</span>').join('') } <span style="margin-left:auto"></span></div>
     `;
+    div.addEventListener('click', ()=> openDetail(item));
     hitsEl.appendChild(div);
   });
-  
-  countEl.textContent = `${state.results.length} results`;
+
+  // pagination controls
+  const pages = Math.ceil(state.results.length / state.perPage);
+  const pager = document.createElement('div');
+  pager.style.display = 'flex';
+  pager.style.gap = '8px';
+  pager.style.justifyContent = 'center';
+  pager.style.marginTop = '10px';
+  pager.style.alignItems = 'center';
+
+  const prev = document.createElement('button');
+  prev.className = 'btn';
+  prev.textContent = 'Prev';
+  prev.disabled = state.page<=1;
+  prev.style.opacity = prev.disabled?0.5:1;
+  prev.addEventListener('click', ()=>{ state.page--; renderResults(); });
+
+  const next = document.createElement('button');
+  next.className = 'btn';
+  next.textContent = 'Next';
+  next.disabled = state.page>=pages;
+  next.style.opacity = next.disabled?0.5:1;
+  next.addEventListener('click', ()=>{ state.page++; renderResults(); });
+
+  const pageInfo = document.createElement('div');
+  pageInfo.className = 'small';
+  pageInfo.textContent = `${state.page} / ${pages}`;
+
+  pager.appendChild(prev);
+  pager.appendChild(pageInfo);
+  pager.appendChild(next);
+  hitsEl.appendChild(pager);
 }
 
-function applySearch(){
-  state.query = qEl.value;
-  
-  if(state.query.trim()){
-    state.results = fuse.search(state.query);
+/* --------------------
+   Open detail (simple modal replacement)
+   -------------------- */
+function openDetail(item){
+  alert(`${item.title}\n\n${item.description}\n\nTags: ${item.tags.join(', ')}\nDate: ${item.date}`);
+}
+
+/* --------------------
+   Search logic
+   -------------------- */
+function runSearch(q){
+  state.query = q || '';
+  state.page = 1;
+  state.perPage = parseInt(perPageEl.value,10);
+  // Apply Fuse search or return all when empty
+  let results;
+  if(!state.query.trim()){
+    // raw list, maybe sorted
+    results = DATA.map(d => ({ item: d }));
   } else {
-    state.results = DATA.map(item => ({ item }));
+    results = fuse.search(state.query);
   }
-  
+
+  // Filter by tag if active
   if(state.activeTag){
-    state.results = state.results.filter(r => r.item.tags.includes(state.activeTag));
+    results = results.filter(r => (r.item || r).tags.includes(state.activeTag));
   }
-  
+
+  // Sorting
+  const sortBy = sortEl.value;
+  results.sort((a,b)=>{
+    const ia = (a.item||a), ib=(b.item||b);
+    if(sortBy === 'newest') return new Date(ib.date) - new Date(ia.date);
+    if(sortBy === 'oldest') return new Date(ia.date) - new Date(ib.date);
+    return 0; // keep Fuse order (relevance)
+  });
+
+  state.results = results;
   renderResults();
+  buildTagFilters();
 }
 
-qEl.addEventListener('input', debounce(()=>{
-  showSuggestions(qEl.value);
-  applySearch();
-}, 100));
+/* Debounced wrapper for suggestions when typing */
+const onType = debounce((val)=>{
+  showSuggestions(val);
+  // live search (if you want immediate results while typing)
+  runSearch(val);
+}, 220);
 
-qEl.addEventListener('focus', ()=>{
-  if(qEl.value.trim().length >= 2) suggestionsEl.hidden = false;
+/* Non-debounced apply (explicit search button or enter) */
+function applySearch(){
+  suggestionsEl.hidden = true;
+  runSearch(qEl.value.trim());
+}
+
+/* Keyboard navigation for suggestions */
+qEl.addEventListener('keydown', (ev)=>{
+  const suggestions = Array.from(suggestionsEl.querySelectorAll('.suggestion'));
+  if(suggestionsEl.hidden || suggestions.length===0) return;
+  if(ev.key === 'ArrowDown'){ ev.preventDefault(); state.suggestionIndex = Math.min(state.suggestionIndex+1, suggestions.length-1); updateSuggestionActive(suggestions); }
+  if(ev.key === 'ArrowUp'){ ev.preventDefault(); state.suggestionIndex = Math.max(state.suggestionIndex-1, 0); updateSuggestionActive(suggestions); }
+  if(ev.key === 'Enter'){ if(state.suggestionIndex >= 0){ ev.preventDefault(); suggestions[state.suggestionIndex].click(); state.suggestionIndex=-1; } else { applySearch(); } }
 });
+function updateSuggestionActive(suggestions){
+  suggestions.forEach((s, i)=> s.classList.toggle('active', i === state.suggestionIndex));
+  if(state.suggestionIndex>=0){
+    suggestions[state.suggestionIndex].scrollIntoView({block:'nearest'});
+  }
+}
 
-qEl.addEventListener('blur', ()=>{
-  setTimeout(()=> suggestionsEl.hidden = true, 150);
-});
-
+/* DOM events */
+qEl.addEventListener('input', (e)=> onType(e.target.value));
+qEl.addEventListener('focus', (e)=> showSuggestions(e.target.value));
+document.addEventListener('click', (e)=> { if(!suggestionsEl.contains(e.target) && e.target !== qEl) suggestionsEl.hidden = true; });
 searchBtn.addEventListener('click', applySearch);
-
-perPageEl.addEventListener('change', renderResults);
-sortEl.addEventListener('change', renderResults);
+perPageEl.addEventListener('change', ()=>{ state.perPage = parseInt(perPageEl.value,10); renderResults(); });
+sortEl.addEventListener('change', ()=> runSearch(qEl.value));
 
 toggleThemeBtn.addEventListener('click', ()=>{
-  document.documentElement.classList.toggle('dark');
-  localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  // simple theme toggle (light/dark) by flipping root colors
+  if(document.documentElement.style.getPropertyValue('--bg') === '#0f1724'){
+    document.documentElement.style.setProperty('--bg', '#f7fafc');
+    document.documentElement.style.setProperty('--card', '#ffffff');
+    document.documentElement.style.setProperty('--muted', '#475569');
+    document.documentElement.style.setProperty('--accent', '#60a5fa');
+    document.documentElement.style.setProperty('--accent-2', '#7c3aed');
+    document.documentElement.style.setProperty('--glass', 'rgba(0,0,0,0.03)');
+    document.body.style.color = '#0b1220';
+  } else {
+    document.documentElement.style.setProperty('--bg', '#0f1724');
+    document.documentElement.style.setProperty('--card', '#0b1220');
+    document.documentElement.style.setProperty('--muted', '#9aa4b2');
+    document.documentElement.style.setProperty('--accent', '#6ee7b7');
+    document.documentElement.style.setProperty('--accent-2', '#60a5fa');
+    document.documentElement.style.setProperty('--glass', 'rgba(255,255,255,0.04)');
+    document.body.style.color = '#e6eef6';
+  }
 });
 
-if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){
-  document.documentElement.classList.add('dark');
-}
-
+/* Init */
 buildTagFilters();
-applySearch();
+runSearch(''); // initial render
 </script>
 
 </body>
