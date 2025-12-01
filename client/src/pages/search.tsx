@@ -148,13 +148,13 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen dark:bg-gradient-to-br dark:from-[#071124] dark:to-[#0a0f1a] light:bg-gradient-to-br light:from-slate-50 light:to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#071124] dark:to-[#0a0f1a]">
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-3xl">
           {/* Header */}
           <div className="mb-8 flex items-start justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="gradient-accent flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-bold text-white dark:shadow-lg dark:shadow-blue-500/20">
+              <div className="gradient-accent flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-bold text-white shadow-lg shadow-blue-500/20">
                 SI
               </div>
               <div>
@@ -195,7 +195,7 @@ export default function SearchPage() {
                 onChange={(e) => handleQueryChange(e.target.value)}
                 onFocus={() => query.trim().length >= 2 && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                className="pl-4 pr-12 py-3 text-base rounded-xl dark:bg-card dark:border-white/5 light:bg-white light:border-gray-200 dark:text-foreground light:text-foreground dark:placeholder:text-muted-foreground light:placeholder:text-gray-500"
+                className="pl-4 pr-12 py-3 text-base rounded-xl bg-white border-gray-200 text-foreground placeholder:text-gray-500 dark:bg-card dark:border-white/5 dark:placeholder:text-muted-foreground"
                 data-testid="input-search"
               />
               <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground pointer-events-none opacity-60" />
@@ -203,7 +203,7 @@ export default function SearchPage() {
 
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 z-40 rounded-lg glass-effect dark:bg-card/95 light:bg-white/95 border dark:border-white/5 light:border-gray-200 overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-2 z-40 rounded-lg glass-effect bg-white/95 border border-gray-200 overflow-hidden dark:bg-card/95 dark:border-white/5">
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion}
@@ -211,7 +211,7 @@ export default function SearchPage() {
                       setQuery(suggestion);
                       setShowSuggestions(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm hover:dark:bg-white/5 hover:light:bg-gray-100 transition-colors"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors dark:hover:bg-white/5"
                     data-testid={`suggestion-${suggestion}`}
                   >
                     {suggestion}
@@ -233,10 +233,10 @@ export default function SearchPage() {
                   return (
                     <div
                       key={result.item.id}
-                      className="group rounded-lg glass-effect dark:bg-gradient-to-br dark:from-white/2 dark:to-white/1 light:bg-white/50 dark:border-white/5 light:border-gray-200 p-4 cursor-pointer hit-card dark:hover:shadow-lg dark:hover:shadow-blue-500/10"
+                      className="group rounded-lg glass-effect bg-white/50 border border-gray-200 p-4 cursor-pointer hit-card dark:bg-gradient-to-br dark:from-white/2 dark:to-white/1 dark:border-white/5 dark:hover:shadow-lg dark:hover:shadow-blue-500/10"
                       data-testid={`card-result-${result.item.id}`}
                     >
-                      <h3 className="font-bold text-base mb-1 dark:text-foreground light:text-foreground">
+                      <h3 className="font-bold text-base mb-1 text-foreground">
                         {titleMatch.length > 0
                           ? highlightText(result.item.title, titleMatch)
                           : result.item.title}
@@ -251,7 +251,7 @@ export default function SearchPage() {
                           {result.item.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="px-2 py-1 rounded-full dark:bg-white/5 light:bg-gray-200 font-medium"
+                              className="px-2 py-1 rounded-full bg-gray-200 font-medium text-foreground dark:bg-white/5"
                             >
                               {tag}
                             </span>
@@ -263,14 +263,14 @@ export default function SearchPage() {
                   );
                 })
               ) : (
-                <div className="rounded-lg glass-effect dark:bg-card light:bg-white/50 p-8 text-center">
+                <div className="rounded-lg glass-effect bg-white/50 border border-gray-200 p-8 text-center dark:bg-card dark:border-white/5">
                   <p className="text-muted-foreground">No results found. Try a different search.</p>
                 </div>
               )}
             </div>
 
             {/* Sidebar Filters */}
-            <div className="rounded-lg glass-effect dark:bg-white/2 light:bg-white/50 dark:border-white/5 light:border-gray-200 p-4 dark:h-fit">
+            <div className="rounded-lg glass-effect bg-white/50 border border-gray-200 p-4 dark:bg-white/2 dark:border-white/5 dark:h-fit">
               <div className="mb-6">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Filters
@@ -290,7 +290,7 @@ export default function SearchPage() {
                       className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
                         activeTag === tag
                           ? "gradient-btn text-white"
-                          : "dark:bg-white/5 light:bg-gray-200 dark:text-foreground light:text-foreground hover:dark:bg-white/10 hover:light:bg-gray-300"
+                          : "bg-gray-200 text-foreground hover:bg-gray-300 dark:bg-white/5 dark:text-foreground dark:hover:bg-white/10"
                       }`}
                       data-testid={`button-tag-${tag}`}
                     >
@@ -309,7 +309,7 @@ export default function SearchPage() {
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 text-sm rounded-lg dark:bg-white/5 light:bg-white dark:text-foreground light:text-foreground dark:border-white/10 light:border-gray-300 border"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-white border border-gray-300 text-foreground dark:bg-white/5 dark:border-white/10 dark:text-foreground"
                   data-testid="select-per-page"
                 >
                   <option value="5">5</option>
@@ -326,7 +326,7 @@ export default function SearchPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm rounded-lg dark:bg-white/5 light:bg-white dark:text-foreground light:text-foreground dark:border-white/10 light:border-gray-300 border"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-white border border-gray-300 text-foreground dark:bg-white/5 dark:border-white/10 dark:text-foreground"
                   data-testid="select-sort"
                 >
                   <option value="relevance">Relevance</option>
